@@ -1,12 +1,14 @@
 import React, { useState } from "react";
+import { useLoaderData } from "react-router-dom";
 
-const AddUser = () => {
-  const [user, setUser] = useState({});
-  const handleAddUser = (event) => {
+const Update = () => {
+  const storedUser = useLoaderData();
+  const [user, setUser] = useState(storedUser);
+  const handleUpdateUser = (event) => {
     event.preventDefault();
-    console.log(user);
-    fetch("http://localhost:5000/users", {
-      method: "POST",
+    // console.log(user);
+    fetch(`http://localhost:5000/users/${storedUser._id}`, {
+      method: "PUT",
       headers: {
         "content-type": "application/json",
       },
@@ -14,13 +16,13 @@ const AddUser = () => {
     })
       .then((res) => res.json())
       .then((data) => {
-        if (data.acknowledged) {
-          alert("user added successfully");
-          event.target.reset();
+        if (data.modifiedCount > 0) {
+          alert("User information updated successfully");
+          console.log(data);
         }
       });
   };
-  const handleInputBlur = (event) => {
+  const handleInputChange = (event) => {
     const field = event.target.name;
     const value = event.target.value;
     const newUser = { ...user };
@@ -29,10 +31,11 @@ const AddUser = () => {
   };
   return (
     <div>
-      <h3>Please add a new user</h3>
-      <form onSubmit={handleAddUser}>
+      <h3>Please update: {storedUser.name} </h3>
+      <form onSubmit={handleUpdateUser}>
         <input
-          onChange={handleInputBlur}
+          onChange={handleInputChange}
+          defaultValue={storedUser.name}
           type="text"
           name="name"
           placeholder="name"
@@ -40,7 +43,8 @@ const AddUser = () => {
         />
         <br />
         <input
-          onChange={handleInputBlur}
+          onChange={handleInputChange}
+          defaultValue={storedUser.address}
           type="text"
           name="address"
           placeholder="address"
@@ -48,7 +52,8 @@ const AddUser = () => {
         />
         <br />
         <input
-          onChange={handleInputBlur}
+          onChange={handleInputChange}
+          defaultValue={storedUser.email}
           type="email"
           name="email"
           id=""
@@ -56,10 +61,10 @@ const AddUser = () => {
           required
         />
         <br />
-        <button type="submit">Add user</button>
+        <button type="submit">Update user</button>
       </form>
     </div>
   );
 };
 
-export default AddUser;
+export default Update;
